@@ -69,7 +69,7 @@ int main(int argc, char** argv)
   //
   // .. _RobotModelLoader:
   //     http://docs.ros.org/indigo/api/moveit_ros_planning/html/classrobot__model__loader_1_1RobotModelLoader.html
-  const std::string PLANNING_GROUP = "panda_arm";
+  const std::string PLANNING_GROUP = "manipulator";
   robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
   robot_model::RobotModelPtr robot_model = robot_model_loader.getModel();
   /* Create a RobotState and JointModelGroup to keep track of the current robot pose and planning group*/
@@ -170,9 +170,9 @@ int main(int argc, char** argv)
   //
   // .. _kinematic_constraints:
   //     http://docs.ros.org/indigo/api/moveit_core/html/namespacekinematic__constraints.html#a88becba14be9ced36fefc7980271e132
-  req.group_name = "panda_arm";
+  req.group_name = "manipulator";
   moveit_msgs::Constraints pose_goal =
-      kinematic_constraints::constructGoalConstraints("panda_link8", pose, tolerance_pose, tolerance_angle);
+      kinematic_constraints::constructGoalConstraints("ee_link", pose, tolerance_pose, tolerance_angle);
   req.goal_constraints.push_back(pose_goal);
 
   // We now construct a planning context that encapsulate the scene,
@@ -268,7 +268,7 @@ int main(int argc, char** argv)
   pose.pose.position.z = 0.65;
   pose.pose.orientation.w = 1.0;
   moveit_msgs::Constraints pose_goal_2 =
-      kinematic_constraints::constructGoalConstraints("panda_link8", pose, tolerance_pose, tolerance_angle);
+      kinematic_constraints::constructGoalConstraints("ee_link", pose, tolerance_pose, tolerance_angle);
   /* First, set the state in the planning scene to the final state of the last plan */
   robot_state->setJointGroupPositions(joint_model_group, response.trajectory.joint_trajectory.points.back().positions);
   /* Now, let's try to move to this new pose goal*/
@@ -280,7 +280,7 @@ int main(int argc, char** argv)
   geometry_msgs::QuaternionStamped quaternion;
   quaternion.header.frame_id = "panda_link0";
   quaternion.quaternion.w = 1.0;
-  req.path_constraints = kinematic_constraints::constructGoalConstraints("panda_link8", quaternion);
+  req.path_constraints = kinematic_constraints::constructGoalConstraints("ee_link", quaternion);
 
   // Imposing path constraints requires the planner to reason in the space of possible positions of the end-effector
   // (the workspace of the robot)
