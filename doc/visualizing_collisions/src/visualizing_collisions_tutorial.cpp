@@ -72,6 +72,7 @@ void help()
   ROS_INFO("#####################################################");
 }
 
+// 이전 마커를  삭제하고 새로운 마커 추가
 void publishMarkers(visualization_msgs::MarkerArray& markers)
 {
   // delete old markers
@@ -80,7 +81,7 @@ void publishMarkers(visualization_msgs::MarkerArray& markers)
     for (int i = 0; i < g_collision_points.markers.size(); i++)
       g_collision_points.markers[i].action = visualization_msgs::Marker::DELETE;
 
-    g_marker_array_publisher->publish(g_collision_points);
+    g_marker_array_publisher->publish(g_collision_points); // 충돌지점 퍼블리쉬
   }
 
   // move new markers into g_collision_points
@@ -88,9 +89,10 @@ void publishMarkers(visualization_msgs::MarkerArray& markers)
 
   // draw new markers (if there are any)
   if (g_collision_points.markers.size())
-    g_marker_array_publisher->publish(g_collision_points);
+    g_marker_array_publisher->publish(g_collision_points); 
 }
 
+// 충돌 했을 때
 void computeCollisionContactPoints(InteractiveRobot& robot)
 {
   // move the world geometry in the collision world
@@ -103,7 +105,7 @@ void computeCollisionContactPoints(InteractiveRobot& robot)
   //
   // Collision Requests
   // ^^^^^^^^^^^^^^^^^^
-  // We will create a collision request for the Panda robot
+  // We will create a collision request for the UR robot
   collision_detection::CollisionRequest c_req;
   collision_detection::CollisionResult c_res;
   c_req.group_name = robot.getGroupName();
@@ -128,7 +130,7 @@ void computeCollisionContactPoints(InteractiveRobot& robot)
   // `collision_tools.cpp
   // <https://github.com/ros-planning/moveit/blob/kinetic-devel/moveit_core/collision_detection/src/collision_tools.cpp>`_
   // for how.
-  if (c_res.collision)
+  if (c_res.collision) // 충돌한 접촉지점을 MarkerArray 메세지에 추가(visualization)
   {
     ROS_INFO("COLLIDING contact_point_count=%d", (int)c_res.contact_count);
     if (c_res.contact_count > 0)
@@ -141,7 +143,7 @@ void computeCollisionContactPoints(InteractiveRobot& robot)
       visualization_msgs::MarkerArray markers;
 
       /* Get the contact ponts and display them as markers */
-      collision_detection::getCollisionMarkersFromContacts(markers, "panda_link0", c_res.contacts, color,
+      collision_detection::getCollisionMarkersFromContacts(markers, "base_link", c_res.contacts, color,
                                                            ros::Duration(),  // remain until deleted
                                                            0.01);            // radius
       publishMarkers(markers);
